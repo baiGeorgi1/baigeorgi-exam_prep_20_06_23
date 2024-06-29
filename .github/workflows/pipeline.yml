@@ -1,27 +1,45 @@
-
 name: Build-Test-Deploy
 
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    push:
+        branches: ["main"]
+    pull_request:
+        branches: ["main"]
 
 jobs:
-  Build-and-UnitTesting:
+    Build-and-UnitTesting:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout the app
+              uses: actions/checkout@v4
+            - name: Use Node.js 20.x
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20.x
+                  cache: "npm"
+            - name: Install Dependencies
+              run: npm install
+            - name: Unit Testing
+              run: npm run test:unit
+            - name: SoftUni username
+              run: echo 'baigeorgi'
 
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout the app
-      uses: actions/checkout@v4
-    - name: Use Node.js 20.x
-      uses: actions/setup-node@v4
-      with:
-        node-version: 20.x
-        cache: 'npm'
-    - name: Install Dependencies
-      run: npm install
-    - name: Unit Testing
-      run: npm run test:unit
-    - name: SoftUni username
-      run: echo 'baigeorgi'
+    UI_Testing:
+        needs: Build-and-UnitTesting
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout the app
+              uses: actions/checkout@v4
+            - name: Use Node.js 20.x
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20.x
+                  cache: "npm"
+            - name: Install Dependencies
+              run: npm install
+            - name: Starting the app
+              run: npm start &
+            - name: Install Playwright browsers
+              run: npx playwright install
+            - name: Execute the UI tests
+              run: npm run test:ui
